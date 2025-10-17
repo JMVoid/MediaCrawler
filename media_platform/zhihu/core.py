@@ -12,7 +12,7 @@
 # -*- coding: utf-8 -*-
 import asyncio
 import os
-# import random  # Removed as we now use fixed config.CRAWLER_MAX_SLEEP_SEC intervals
+import random
 from asyncio import Task
 from typing import Dict, List, Optional, Tuple, cast
 
@@ -30,7 +30,7 @@ from base.base_crawler import AbstractCrawler
 from model.m_zhihu import ZhihuContent, ZhihuCreator
 from proxy.proxy_ip_pool import IpInfoModel, create_ip_pool
 from store import zhihu as zhihu_store
-from tools import utils
+from tools import crawler_util, utils
 from tools.cdp_browser import CDPBrowserManager
 from var import crawler_type_var, source_keyword_var
 
@@ -171,9 +171,12 @@ class ZhihuCrawler(AbstractCrawler):
                         break
 
                     # Sleep after page navigation
-                    await asyncio.sleep(config.CRAWLER_MAX_SLEEP_SEC)
-                    utils.logger.info(f"[ZhihuCrawler.search] Sleeping for {config.CRAWLER_MAX_SLEEP_SEC} seconds after page {page-1}")
-                    
+                    await crawler_util.reinforced_sleep(
+                        config.CRAWLER_MIN_SLEEP_SEC,
+                        config.CRAWLER_MAX_SLEEP_SEC,
+                        f"search page {page - 1}",
+                    )
+
                     page += 1
                     for content in content_list:
                         await zhihu_store.update_zhihu_content(content)
@@ -223,11 +226,14 @@ class ZhihuCrawler(AbstractCrawler):
             utils.logger.info(
                 f"[ZhihuCrawler.get_comments] Begin get note id comments {content_item.content_id}"
             )
-            
+
             # Sleep before fetching comments
-            await asyncio.sleep(config.CRAWLER_MAX_SLEEP_SEC)
-            utils.logger.info(f"[ZhihuCrawler.get_comments] Sleeping for {config.CRAWLER_MAX_SLEEP_SEC} seconds before fetching comments for content {content_item.content_id}")
-            
+            await crawler_util.reinforced_sleep(
+                config.CRAWLER_MIN_SLEEP_SEC,
+                config.CRAWLER_MAX_SLEEP_SEC,
+                f"before fetching comments for content {content_item.content_id}",
+            )
+
             await self.zhihu_client.get_note_all_comments(
                 content=content_item,
                 crawl_interval=config.CRAWLER_MAX_SLEEP_SEC,
@@ -314,11 +320,14 @@ class ZhihuCrawler(AbstractCrawler):
                     f"[ZhihuCrawler.get_specified_notes] Get answer info, question_id: {question_id}, answer_id: {answer_id}"
                 )
                 result = await self.zhihu_client.get_answer_info(question_id, answer_id)
-                
+
                 # Sleep after fetching answer details
-                await asyncio.sleep(config.CRAWLER_MAX_SLEEP_SEC)
-                utils.logger.info(f"[ZhihuCrawler.get_note_detail] Sleeping for {config.CRAWLER_MAX_SLEEP_SEC} seconds after fetching answer details {answer_id}")
-                
+                await crawler_util.reinforced_sleep(
+                    config.CRAWLER_MIN_SLEEP_SEC,
+                    config.CRAWLER_MAX_SLEEP_SEC,
+                    f"fetching answer details {answer_id}",
+                )
+
                 return result
 
             elif note_type == constant.ARTICLE_NAME:
@@ -327,11 +336,14 @@ class ZhihuCrawler(AbstractCrawler):
                     f"[ZhihuCrawler.get_specified_notes] Get article info, article_id: {article_id}"
                 )
                 result = await self.zhihu_client.get_article_info(article_id)
-                
+
                 # Sleep after fetching article details
-                await asyncio.sleep(config.CRAWLER_MAX_SLEEP_SEC)
-                utils.logger.info(f"[ZhihuCrawler.get_note_detail] Sleeping for {config.CRAWLER_MAX_SLEEP_SEC} seconds after fetching article details {article_id}")
-                
+                await crawler_util.reinforced_sleep(
+                    config.CRAWLER_MIN_SLEEP_SEC,
+                    config.CRAWLER_MAX_SLEEP_SEC,
+                    f"fetching article details {article_id}",
+                )
+
                 return result
 
             elif note_type == constant.VIDEO_NAME:
@@ -340,11 +352,14 @@ class ZhihuCrawler(AbstractCrawler):
                     f"[ZhihuCrawler.get_specified_notes] Get video info, video_id: {video_id}"
                 )
                 result = await self.zhihu_client.get_video_info(video_id)
-                
+
                 # Sleep after fetching video details
-                await asyncio.sleep(config.CRAWLER_MAX_SLEEP_SEC)
-                utils.logger.info(f"[ZhihuCrawler.get_note_detail] Sleeping for {config.CRAWLER_MAX_SLEEP_SEC} seconds after fetching video details {video_id}")
-                
+                await crawler_util.reinforced_sleep(
+                    config.CRAWLER_MIN_SLEEP_SEC,
+                    config.CRAWLER_MAX_SLEEP_SEC,
+                    f"fetching video details {video_id}",
+                )
+
                 return result
 
     async def get_specified_notes(self):

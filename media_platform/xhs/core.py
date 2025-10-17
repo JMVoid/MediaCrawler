@@ -29,7 +29,7 @@ from config import CRAWLER_MAX_COMMENTS_COUNT_SINGLENOTES
 from model.m_xiaohongshu import NoteUrlInfo
 from proxy.proxy_ip_pool import IpInfoModel, create_ip_pool
 from store import xhs as xhs_store
-from tools import utils
+from tools import crawler_util, utils
 from tools.cdp_browser import CDPBrowserManager
 from var import crawler_type_var, source_keyword_var
 
@@ -163,10 +163,13 @@ class XiaoHongShuCrawler(AbstractCrawler):
                     page += 1
                     utils.logger.info(f"[XiaoHongShuCrawler.search] Note details: {note_details}")
                     await self.batch_get_note_comments(note_ids, xsec_tokens)
-                    
+
                     # Sleep after each page navigation
-                    await asyncio.sleep(config.CRAWLER_MAX_SLEEP_SEC)
-                    utils.logger.info(f"[XiaoHongShuCrawler.search] Sleeping for {config.CRAWLER_MAX_SLEEP_SEC} seconds after page {page-1}")
+                    await crawler_util.reinforced_sleep(
+                        config.CRAWLER_MIN_SLEEP_SEC,
+                        config.CRAWLER_MAX_SLEEP_SEC,
+                        f"search page {page - 1}",
+                    )
                 except DataFetchError:
                     utils.logger.error("[XiaoHongShuCrawler.search] Get note detail error")
                     break
@@ -280,11 +283,14 @@ class XiaoHongShuCrawler(AbstractCrawler):
                         raise Exception(f"[get_note_detail_async_task] Failed to get note detail, Id: {note_id}")
 
                 note_detail.update({"xsec_token": xsec_token, "xsec_source": xsec_source})
-                
+
                 # Sleep after fetching note detail
-                await asyncio.sleep(config.CRAWLER_MAX_SLEEP_SEC)
-                utils.logger.info(f"[get_note_detail_async_task] Sleeping for {config.CRAWLER_MAX_SLEEP_SEC} seconds after fetching note {note_id}")
-                
+                await crawler_util.reinforced_sleep(
+                    config.CRAWLER_MIN_SLEEP_SEC,
+                    config.CRAWLER_MAX_SLEEP_SEC,
+                    f"fetching note {note_id}",
+                )
+
                 return note_detail
 
             except DataFetchError as ex:
@@ -324,10 +330,13 @@ class XiaoHongShuCrawler(AbstractCrawler):
                 callback=xhs_store.batch_update_xhs_note_comments,
                 max_count=CRAWLER_MAX_COMMENTS_COUNT_SINGLENOTES,
             )
-            
+
             # Sleep after fetching comments
-            await asyncio.sleep(crawl_interval)
-            utils.logger.info(f"[XiaoHongShuCrawler.get_comments] Sleeping for {crawl_interval} seconds after fetching comments for note {note_id}")
+            await crawler_util.reinforced_sleep(
+                config.CRAWLER_MIN_SLEEP_SEC,
+                config.CRAWLER_MAX_SLEEP_SEC,
+                f"fetching comments for note {note_id}",
+            )
 
     async def create_xhs_client(self, httpx_proxy: Optional[str]) -> XiaoHongShuClient:
         """Create xhs client"""

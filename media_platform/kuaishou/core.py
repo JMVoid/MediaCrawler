@@ -11,7 +11,7 @@
 
 import asyncio
 import os
-# import random  # Removed as we now use fixed config.CRAWLER_MAX_SLEEP_SEC intervals
+import random
 import time
 from asyncio import Task
 from typing import Dict, List, Optional, Tuple
@@ -28,7 +28,7 @@ import config
 from base.base_crawler import AbstractCrawler
 from proxy.proxy_ip_pool import IpInfoModel, create_ip_pool
 from store import kuaishou as kuaishou_store
-from tools import utils
+from tools import crawler_util, utils
 from tools.cdp_browser import CDPBrowserManager
 from var import comment_tasks_var, crawler_type_var, source_keyword_var
 
@@ -159,11 +159,14 @@ class KuaishouCrawler(AbstractCrawler):
 
                 # batch fetch video comments
                 page += 1
-                
+
                 # Sleep after page navigation
-                await asyncio.sleep(config.CRAWLER_MAX_SLEEP_SEC)
-                utils.logger.info(f"[KuaishouCrawler.search] Sleeping for {config.CRAWLER_MAX_SLEEP_SEC} seconds after page {page-1}")
-                
+                await crawler_util.reinforced_sleep(
+                    config.CRAWLER_MIN_SLEEP_SEC,
+                    config.CRAWLER_MAX_SLEEP_SEC,
+                    f"search page {page - 1}",
+                )
+
                 await self.batch_get_video_comments(video_id_list)
 
     async def get_specified_videos(self):
@@ -186,11 +189,14 @@ class KuaishouCrawler(AbstractCrawler):
         async with semaphore:
             try:
                 result = await self.ks_client.get_video_info(video_id)
-                
+
                 # Sleep after fetching video details
-                await asyncio.sleep(config.CRAWLER_MAX_SLEEP_SEC)
-                utils.logger.info(f"[KuaishouCrawler.get_video_info_task] Sleeping for {config.CRAWLER_MAX_SLEEP_SEC} seconds after fetching video details {video_id}")
-                
+                await crawler_util.reinforced_sleep(
+                    config.CRAWLER_MIN_SLEEP_SEC,
+                    config.CRAWLER_MAX_SLEEP_SEC,
+                    f"video details {video_id}",
+                )
+
                 utils.logger.info(
                     f"[KuaishouCrawler.get_video_info_task] Get video_id:{video_id} info result: {result} ..."
                 )
@@ -244,11 +250,14 @@ class KuaishouCrawler(AbstractCrawler):
                 utils.logger.info(
                     f"[KuaishouCrawler.get_comments] begin get video_id: {video_id} comments ..."
                 )
-                
+
                 # Sleep before fetching comments
-                await asyncio.sleep(config.CRAWLER_MAX_SLEEP_SEC)
-                utils.logger.info(f"[KuaishouCrawler.get_comments] Sleeping for {config.CRAWLER_MAX_SLEEP_SEC} seconds before fetching comments for video {video_id}")
-                
+                await crawler_util.reinforced_sleep(
+                    config.CRAWLER_MIN_SLEEP_SEC,
+                    config.CRAWLER_MAX_SLEEP_SEC,
+                    f"before fetching comments for video {video_id}",
+                )
+
                 await self.ks_client.get_video_all_comments(
                     photo_id=video_id,
                     crawl_interval=config.CRAWLER_MAX_SLEEP_SEC,

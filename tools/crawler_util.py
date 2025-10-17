@@ -14,6 +14,7 @@
 # @Time    : 2023/12/2 12:53
 # @Desc    : 爬虫相关的工具函数
 
+import asyncio
 import base64
 import json
 import random
@@ -27,6 +28,7 @@ import httpx
 from PIL import Image, ImageDraw, ImageShow
 from playwright.async_api import Cookie, Page
 
+import config
 from . import utils
 
 
@@ -210,3 +212,30 @@ def extract_url_params_to_dict(url: str) -> Dict:
     parsed_url = urllib.parse.urlparse(url)
     url_params_dict = dict(urllib.parse.parse_qsl(parsed_url.query))
     return url_params_dict
+
+
+def get_random_reward(zero_val=0, val1=300, val2=900, p0=80, p1=10, p2=10) -> int:
+    """get random reward for sleep"""
+    return random.choices([zero_val, val1, val2], weights=[p0, p1, p2])[0]
+
+
+async def reinforced_sleep(min_sleep_seconds: float, max_sleep_seconds: float, message: str = ""):
+    """
+    Reinforced sleep with random reward.
+    Args:
+        min_sleep_seconds: min sleep seconds
+        max_sleep_seconds: max sleep seconds
+        message: log message
+    """
+    random_sleep_time = random.uniform(min_sleep_seconds, max_sleep_seconds)
+    long_term_sleep = get_random_reward(
+        zero_val=0,
+        val1=config.REINFORCED_SLEEP_REWARD_VAL1,
+        val2=config.REINFORCED_SLEEP_REWARD_VAL2,
+        p0=config.REINFORCED_SLEEP_REWARD_P0,
+        p1=config.REINFORCED_SLEEP_REWARD_P1,
+        p2=config.REINFORCED_SLEEP_REWARD_P2,
+    )
+    final_sleep_time = max(random_sleep_time, long_term_sleep)
+    utils.logger.info(f"[reinforced_sleep] {message} Sleeping for {final_sleep_time:.2f} seconds ...")
+    await asyncio.sleep(final_sleep_time)
