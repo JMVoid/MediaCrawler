@@ -317,6 +317,7 @@ class WeiboCrawler(AbstractCrawler):
         """Create xhs client"""
         utils.logger.info("[WeiboCrawler.create_weibo_client] Begin create weibo API client ...")
         cookie_str, cookie_dict = utils.convert_cookies(await self.browser_context.cookies())
+        timeout = getattr(config.weibo_config, 'DOWNLOAD_TIMEOUT', config.base_config.DOWNLOAD_TIMEOUT)
         weibo_client_obj = WeiboClient(
             proxy=httpx_proxy,
             headers={
@@ -328,6 +329,7 @@ class WeiboCrawler(AbstractCrawler):
             },
             playwright_page=self.context_page,
             cookie_dict=cookie_dict,
+            timeout=timeout,
         )
         return weibo_client_obj
 

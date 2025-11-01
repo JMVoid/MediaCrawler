@@ -1,0 +1,117 @@
+# MediaCrawler 外部配置文件模板
+# =================================================
+# 使用说明:
+# 1. 将此文件重命名为 config.yaml 并放置在项目根目录。
+# 2. 在此文件中取消注释并修改您需要覆盖的配置项。
+# 3. 程序启动时会自动加载此文件。
+# 4. 您也可以通过命令行参数 --config /path/to/your.yaml 指定其他路径。
+# 5. YAML中的值会自动进行类型转换 (例如 "True" -> True, "123" -> 123)。
+# 6. 对于列表类型的配置（如 *_SPECIFIED_ID_LIST），建议仍在.py文件中修改，或在此处使用YAML列表格式。
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 1. 基础配置 (对应 base_config.py)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+base_config:
+  PLATFORM: xhs
+  KEYWORDS: "编程副业,编程兼职"
+  LOGIN_TYPE: qrcode
+  COOKIES: ""
+  CRAWLER_TYPE: search
+  ENABLE_IP_PROXY: false
+  IP_PROXY_POOL_COUNT: 2
+  IP_PROXY_PROVIDER_NAME: kuaidaili
+  HEADLESS: false
+  SAVE_LOGIN_STATE: true
+  ENABLE_CDP_MODE: true
+  CDP_DEBUG_PORT: 9222
+  CUSTOM_BROWSER_PATH: ""
+  CDP_HEADLESS: false
+  BROWSER_LAUNCH_TIMEOUT: 30
+  AUTO_CLOSE_BROWSER: true
+  SAVE_DATA_OPTION: json
+  USER_DATA_DIR: "%s_user_data_dir"
+  START_PAGE: 1
+  CRAWLER_MAX_NOTES_COUNT: 300
+  MAX_CONCURRENCY_NUM: 1
+  ENABLE_GET_MEIDAS: true
+  ENABLE_GET_COMMENTS: true
+  CRAWLER_MAX_COMMENTS_COUNT_SINGLENOTES: 10
+  ENABLE_GET_SUB_COMMENTS: false
+  ENABLE_GET_WORDCLOUD: false
+  STOP_WORDS_FILE: ./docs/hit_stopwords.txt
+  FONT_PATH: ./docs/STZHONGS.TTF
+  CRAWLER_MIN_SLEEP_SEC: 3
+  CRAWLER_MAX_SLEEP_SEC: 8
+  REINFORCED_SLEEP_REWARD_VAL1: 300
+  REINFORCED_SLEEP_REWARD_VAL2: 900
+  REINFORCED_SLEEP_REWARD_P0: 80
+  REINFORCED_SLEEP_REWARD_P1: 10
+  REINFORCED_SLEEP_REWARD_P2: 2
+  # 全局媒体下载超时时间（秒），默认 180
+  DOWNLOAD_TIMEOUT: 180
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 2. Bilibili 配置 (对应 bilibili_config.py)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+bilibili_config:
+  # B站特定的媒体下载超时时间（秒），不填则使用全局设置
+  DOWNLOAD_TIMEOUT: 300
+  MAX_NOTES_PER_DAY: 1
+  # BILI_SPECIFIED_ID_LIST: ["BV1rY81zpEMa", "BV1d54y1g7db"]
+  # BILI_CREATOR_ID_LIST: [20813884]
+  START_DAY: "2024-01-01"
+  END_DAY: "2024-01-01"
+  BILI_SEARCH_MODE: normal
+  BILI_QN: 16
+  CREATOR_MODE: true
+  START_CONTACTS_PAGE: 1
+  CRAWLER_MAX_CONTACTS_COUNT_SINGLENOTES: 100
+  CRAWLER_MAX_DYNAMICS_COUNT_SINGLENOTES: 50
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 3. 抖音 配置 (对应 dy_config.py)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+dy_config:
+  PUBLISH_TIME_TYPE: 0
+  # DY_SPECIFIED_ID_LIST: ["7280854932641664319"]
+  # DY_CREATOR_ID_LIST: ["MS4wLjABAAAATJPY7LAlaa5X-c8uNdWkvz0jUGgpw4eeXIwu_8BhvqE"]
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 4. 快手 配置 (对应 ks_config.py)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ks_config:
+  # KS_SPECIFIED_ID_LIST: ["3xf8enb8dbj6uig", "3x6zz972bchmvqe"]
+  # KS_CREATOR_ID_LIST: ["3x4sm73aye7jq7i"]
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 5. 贴吧 配置 (对应 tieba_config.py)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tieba_config:
+  # TIEBA_SPECIFIED_ID_LIST: []
+  # TIEBA_NAME_LIST: ["盗墓笔记"]
+  # TIEBA_CREATOR_URL_LIST: ["https://tieba.baidu.com/home/main/?id=tb.1.7f139e2e.6CyEwxu3VJruH_-QqpCi6g&fr=frs"]
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 6. 微博 配置 (对应 weibo_config.py)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+weibo_config:
+  WEIBO_SEARCH_TYPE: popular
+  # WEIBO_SPECIFIED_ID_LIST: ["4982041758140155"]
+  # WEIBO_CREATOR_ID_LIST: ["5533390220"]
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 7. 小红书 配置 (对应 xhs_config.py)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+xhs_config:
+  # 小红书特定的媒体下载超时时间（秒），不填则使用全局设置
+  DOWNLOAD_TIMEOUT: 900
+  SORT_TYPE: popularity_descending
+  # XHS_SPECIFIED_NOTE_URL_LIST: ["https://www.xiaohongshu.com/explore/66fad51c000000001b0224b8?xsec_token=..."]
+  # XHS_CREATOR_ID_LIST: ["63e36c9a000000002703502b"]
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 8. 知乎 配置 (对应 zhihu_config.py)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+zhihu_config:
+  # ZHIHU_CREATOR_URL_LIST: ["https://www.zhihu.com/people/yd1234567"]
+  # ZHIHU_SPECIFIED_ID_LIST: ["https://www.zhihu.com/question/826896610/answer/4885821440"]

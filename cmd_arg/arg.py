@@ -212,6 +212,15 @@ async def parse_cmd(argv: Optional[Sequence[str]] = None):
                 rich_help_panel="账号配置",
             ),
         ] = config.COOKIES,
+        config_path: Annotated[
+            Optional[str],
+            typer.Option(
+                "--config",
+                "-c",
+                help="指定外部配置文件的路径 (例如 config.yaml)",
+                rich_help_panel="高级配置",
+            ),
+        ] = None,
     ) -> SimpleNamespace:
         """MediaCrawler 命令行入口"""
 
@@ -241,6 +250,7 @@ async def parse_cmd(argv: Optional[Sequence[str]] = None):
             save_data_option=config.SAVE_DATA_OPTION,
             init_db=init_db_value,
             cookies=config.COOKIES,
+            config_path=config_path,
         )
 
     command = typer.main.get_command(app)

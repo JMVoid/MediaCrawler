@@ -15,9 +15,6 @@ MAX_NOTES_PER_DAY = 1
 
 # 指定B站视频ID列表
 BILI_SPECIFIED_ID_LIST = [
-    "BV1d54y1g7db",
-    "BV1Sz4y1U77N",
-    "BV14Q4y1n7jz",
     # ........................
 ]
 
@@ -50,3 +47,6 @@ CRAWLER_MAX_CONTACTS_COUNT_SINGLENOTES = 100
 
 # 单个视频/帖子最大爬取动态数
 CRAWLER_MAX_DYNAMICS_COUNT_SINGLENOTES = 50
+
+# B站媒体下载超时时间（秒）
+DOWNLOAD_TIMEOUT = 300

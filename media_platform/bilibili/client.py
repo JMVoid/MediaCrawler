@@ -177,7 +177,7 @@ class BilibiliClient(AbstractApiClient):
             params.update({"aid": aid})
         else:
             params.update({"bvid": bvid})
-        return await self.get(uri, params, enable_params_sign=False)
+        return await self.get(uri, params, enable_params_sign=True)
 
     async def get_video_play_url(self, aid: int, cid: int) -> Dict:
         """

@@ -17,6 +17,7 @@ import cmd_arg
 import config
 from database import db
 from base.base_crawler import AbstractCrawler
+from tools.config_loader import load_and_override_config
 from media_platform.bilibili import BilibiliCrawler
 from media_platform.douyin import DouYinCrawler
 from media_platform.kuaishou import KuaishouCrawler
@@ -58,7 +59,28 @@ async def main():
     # Init crawler
     global crawler
 
-    # parse cmd
+    # Pre-parse for config path to allow config file to be overridden by CLI args
+    config_path: Optional[str] = None
+    if "--config" in sys.argv:
+        try:
+            config_path = sys.argv[sys.argv.index("--config") + 1]
+        except IndexError:
+            pass  # Let Typer handle the error
+    elif any(arg.startswith("-c") for arg in sys.argv):
+        # Handle -c<path> or -c <path>
+        for i, arg in enumerate(sys.argv):
+            if arg == "-c":
+                if i + 1 < len(sys.argv):
+                    config_path = sys.argv[i + 1]
+                break
+            if arg.startswith("-c"):
+                config_path = arg[2:]
+                break
+
+    # Load and override config from yaml first
+    load_and_override_config(config_path)
+
+    # Then, parse command-line arguments, which will override both defaults and the config file
     args = await cmd_arg.parse_cmd()
 
     # init db
@@ -66,8 +88,6 @@ async def main():
         await db.init_db(args.init_db)
         print(f"Database {args.init_db} initialized successfully.")
         return  # Exit the main function cleanly
-
-
 
     crawler = CrawlerFactory.create_crawler(platform=config.PLATFORM)
     await crawler.start()

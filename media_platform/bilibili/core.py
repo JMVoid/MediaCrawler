@@ -448,6 +448,7 @@ class BilibiliCrawler(AbstractCrawler):
         """
         utils.logger.info("[BilibiliCrawler.create_bilibili_client] Begin create bilibili API client ...")
         cookie_str, cookie_dict = utils.convert_cookies(await self.browser_context.cookies())
+        timeout = getattr(config.bilibili_config, 'DOWNLOAD_TIMEOUT', config.base_config.DOWNLOAD_TIMEOUT)
         bilibili_client_obj = BilibiliClient(
             proxy=httpx_proxy,
             headers={
@@ -459,6 +460,7 @@ class BilibiliCrawler(AbstractCrawler):
             },
             playwright_page=self.context_page,
             cookie_dict=cookie_dict,
+            timeout=timeout,
         )
         return bilibili_client_obj
 

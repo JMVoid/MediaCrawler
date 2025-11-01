@@ -342,6 +342,7 @@ class XiaoHongShuCrawler(AbstractCrawler):
         """Create xhs client"""
         utils.logger.info("[XiaoHongShuCrawler.create_xhs_client] Begin create xiaohongshu API client ...")
         cookie_str, cookie_dict = utils.convert_cookies(await self.browser_context.cookies())
+        timeout = getattr(config.xhs_config, 'DOWNLOAD_TIMEOUT', config.base_config.DOWNLOAD_TIMEOUT)
         xhs_client_obj = XiaoHongShuClient(
             proxy=httpx_proxy,
             headers={
@@ -364,6 +365,7 @@ class XiaoHongShuCrawler(AbstractCrawler):
             },
             playwright_page=self.context_page,
             cookie_dict=cookie_dict,
+            timeout=timeout,
         )
         return xhs_client_obj
 
