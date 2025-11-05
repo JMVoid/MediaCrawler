@@ -15,6 +15,7 @@ from typing import Optional
 
 import cmd_arg
 import config
+from cache import cache_factory
 from database import db
 from base.base_crawler import AbstractCrawler
 from tools.config_loader import load_and_override_config
@@ -93,16 +94,18 @@ async def main():
     await crawler.start()
 
 
-def cleanup():
+async def cleanup():
     if crawler:
-        # asyncio.run(crawler.close())
-        pass
+        await crawler.close()
     if config.SAVE_DATA_OPTION in ["db", "sqlite"]:
-        asyncio.run(db.close())
+        await db.close()
+    await cache_factory.close_all_caches()
 
 
 if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
     try:
-        asyncio.get_event_loop().run_until_complete(main())
+        loop.run_until_complete(main())
     finally:
-        cleanup()
+        loop.run_until_complete(cleanup())
+        loop.close()

@@ -14,6 +14,11 @@
 # @Name    : 程序员阿江-Relakkes
 # @Time    : 2024/6/2 11:23
 # @Desc    :
+import asyncio
+from typing import List
+from .abs_cache import AbstractCache
+
+_cache_instances: List[AbstractCache] = []
 
 
 class CacheFactory:
@@ -22,7 +27,7 @@ class CacheFactory:
     """
 
     @staticmethod
-    def create_cache(cache_type: str, *args, **kwargs):
+    def create_cache(cache_type: str, *args, **kwargs) -> AbstractCache:
         """
         创建缓存对象
         :param cache_type: 缓存类型
@@ -30,11 +35,27 @@ class CacheFactory:
         :param kwargs: 关键字参数
         :return:
         """
+        global _cache_instances
+        cache_instance: AbstractCache
         if cache_type == 'memory':
             from .local_cache import ExpiringLocalCache
-            return ExpiringLocalCache(*args, **kwargs)
+            cache_instance = ExpiringLocalCache(*args, **kwargs)
         elif cache_type == 'redis':
             from .redis_cache import RedisCache
-            return RedisCache()
+            cache_instance = RedisCache()
         else:
             raise ValueError(f'Unknown cache type: {cache_type}')
+
+        _cache_instances.append(cache_instance)
+        return cache_instance
+
+
+async def close_all_caches():
+    """
+    关闭所有已创建的缓存实例
+    """
+    global _cache_instances
+    for cache in _cache_instances:
+        if hasattr(cache, 'close') and asyncio.iscoroutinefunction(cache.close):
+            await cache.close()
+    _cache_instances = []

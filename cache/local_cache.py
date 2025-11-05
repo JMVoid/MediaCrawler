@@ -36,13 +36,17 @@ class ExpiringLocalCache(AbstractCache):
         # 开启定时清理任务
         self._schedule_clear()
 
-    def __del__(self):
+    async def close(self):
         """
-        析构函数，清理定时任务
+        关闭并清理定时任务
         :return:
         """
-        if self._cron_task is not None:
+        if self._cron_task:
             self._cron_task.cancel()
+            try:
+                await self._cron_task
+            except asyncio.CancelledError:
+                pass  # 任务取消是正常行为
 
     def get(self, key: str) -> Optional[Any]:
         """
